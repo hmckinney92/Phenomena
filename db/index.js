@@ -1,3 +1,7 @@
+const pg = require('pg');
+const client = new pg.Client(process.env.DATABASE_URL || 'postgres://localhost:5432/phenomena-dev')
+
+
 // Require the Client constructor from the pg package
 
 // Create a constant, CONNECTION_STRING, from either process.env.DATABASE_URL or postgres://localhost:5432/phenomena-dev
@@ -55,9 +59,23 @@ async function getOpenReports() {
  */
 async function createReport(reportFields) {
   // Get all of the fields from the passed in object
-
+  const { title, location, description, password } = reportFields;
 
   try {
+    const SQL = `
+    INSERT INTO reports(title, location, description, password)
+    VALUES ($1, $2, $3, $4)
+    RETURNING *
+    `
+    const response = await client.query(SQL, [title, location, description, password]);
+    const report = response.rows[0];
+    //console.log(report)
+    delete report.password;
+    return report;
+
+
+
+  
     // insert the correct fields into the reports table
     // remember to return the new row from the query
     
