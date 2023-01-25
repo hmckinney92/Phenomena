@@ -23,6 +23,31 @@ const client = new pg.Client(process.env.DATABASE_URL || 'postgres://localhost:5
  */
 async function getOpenReports() {
   try {
+    const { rows: reports } = await client.query(`
+    SELECT * FROM reports
+    WHERE "isOpen"=true;
+    `);
+    for (let i = 0; i < reports.length; i++){
+      const report = reports[i];
+      const { rows: comments } = await client.query(`
+
+      SELECT * FROM comments where "reportId"=$1
+
+      `, [report.id]);
+
+      //console.log(comments)
+      report.comments = [];
+      for(let j = 0; j < comments.length; j++){
+        report.comments.push(comments[j])
+      }
+      
+      //expiration date
+      const expiration = Date.parse(report.expirationDate);
+      const currentDate = Date.now();
+      report.isExpired = expiration < currentDate;
+      
+    }
+     
     // first load all of the reports which are open
     
 
@@ -40,8 +65,9 @@ async function getOpenReports() {
 
     // finally, return the reports
   
-
+  return reports;
   } catch (error) {
+    console.log(error);
     throw error;
   }
 }
@@ -73,9 +99,6 @@ async function createReport(reportFields) {
     delete report.password;
     return report;
 
-
-
-  
     // insert the correct fields into the reports table
     // remember to return the new row from the query
     
@@ -196,3 +219,8 @@ async function createReportComment(reportId, commentFields) {
 }
 
 // export the client and all database functions below
+module.exports = {
+  client,
+  createReport,
+  getOpenReports
+}
