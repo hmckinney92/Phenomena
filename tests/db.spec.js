@@ -103,7 +103,7 @@ describe('Database', () => {
         expect(firstComment.content).toEqual(testComment);
       });
     });
-    xdescribe('_getReport helper function', () => {
+    describe('_getReport helper function', () => {
       let report;
       beforeAll(async() => {
         report = await _getReport(reportIdToCreate);
@@ -113,7 +113,7 @@ describe('Database', () => {
       });
       
     })
-    xdescribe('closeReport', () => {
+    describe('closeReport', () => {
       let message, report;
       beforeAll(async() => {
       })
