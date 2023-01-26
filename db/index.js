@@ -131,6 +131,7 @@ async function createReport(reportFields) {
 async function _getReport(reportId) {
   try {
     // SELECT the report with id equal to reportId
+
     const SQL = `SELECT * FROM reports WHERE id =$1`
 
     const response = await client.query(SQL, [reportId]);
@@ -184,7 +185,7 @@ async function closeReport(reportId, password) {
       return {message: "Report successfully closed!"};
   
     // First, actually grab the report with that id
-    
+   
 
     // If it doesn't exist, throw an error with a useful message
     
