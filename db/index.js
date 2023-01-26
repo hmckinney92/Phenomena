@@ -131,7 +131,11 @@ async function createReport(reportFields) {
 async function _getReport(reportId) {
   try {
     // SELECT the report with id equal to reportId
-    
+    const SQL= `SELECT * FROM reports WHERE id =1$`
+
+    const response = await client.query(SQL, [reportId]);
+    const report = response.rows[0];
+    return report;
 
     // return the report
     
