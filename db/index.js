@@ -24,18 +24,18 @@ const client = new pg.Client(process.env.DATABASE_URL || 'postgres://localhost:5
 async function getOpenReports() {
   try {
     const { rows: reports } = await client.query(`
-    SELECT * FROM reports
-    WHERE "isOpen"=true;
-    `);
+
+    SELECT * FROM reports WHERE "isOpen"=true;`); 
+
     for (let i = 0; i < reports.length; i++){
       const report = reports[i];
+
       const { rows: comments } = await client.query(`
 
       SELECT * FROM comments where "reportId"=$1
 
       `, [report.id]);
 
-      //console.log(comments)
       report.comments = [];
       for(let j = 0; j < comments.length; j++){
         report.comments.push(comments[j])
@@ -131,7 +131,11 @@ async function createReport(reportFields) {
 async function _getReport(reportId) {
   try {
     // SELECT the report with id equal to reportId
-    
+    const SQL = `SELECT * FROM reports WHERE id =$1`
+
+    const response = await client.query(SQL, [reportId]);
+    const report = response.rows[0];
+    return report;
 
     // return the report
     
@@ -152,6 +156,33 @@ async function _getReport(reportId) {
  */
 async function closeReport(reportId, password) {
   try {
+    const { rows: [reports] } = await client.query(`
+    SELECT * FROM reports 
+    WHERE id=$1
+    `, [reportId]);
+    // console.log("here's the report", reports);
+    // console.log("supply password", password);
+
+    if (!reports) {
+      throw new Error ('Report does not exist with that id');
+    }
+
+    if (reports.password !== password){
+      throw new Error('Password incorrect for this report, please try again');
+    }
+    if (!reports.isOpen){
+      throw new Error('This report has already been closed');
+    }
+    const SQL =
+      `
+      UPDATE reports
+      SET "isOpen"='false'
+      WHERE id=$1;
+      `
+      const response= await client.query(SQL, [reportId]);
+      const report = response.rows[0];
+      return {message: "Report successfully closed!"};
+  
     // First, actually grab the report with that id
     
 
@@ -222,5 +253,7 @@ async function createReportComment(reportId, commentFields) {
 module.exports = {
   client,
   createReport,
-  getOpenReports
+  getOpenReports,
+  _getReport,
+  closeReport
 }
