@@ -219,31 +219,36 @@ async function closeReport(reportId, password) {
  * report to CURRENT_TIMESTAMP + interval '1 day' 
  */
 async function createReportComment(reportId, commentFields) {
-  // read off the content from the commentFields
-
-
   try {
-    // grab the report we are going to be commenting on
+    const { rows: [reports] } = await client.query(`
+    SELECT * FROM reports
+    WHERE id = $1
+    `, [reportId]);
+    if(!reports){
+      throw new Error ('That report does not exist, no comment has been made');
 
+    }
 
-    // if it wasn't found, throw an error saying so
-    
+    const expiration = Date.parse(reports.expirationDate);
+    const currentDate = Date.now();
+    if(!reports.isOpen){
+      throw new Error ('That report has been closed, no comment has been made');
+  }
+  if (expiration < currentDate){
+    throw new Error ('The discussion time on this report has expired, no comment has been made');
 
-    // if it is not open, throw an error saying so
-    
+  }
 
-    // if the current date is past the expiration, throw an error saying so
-    // you can use Date.parse(report.expirationDate) < new Date() to check
-    
-
-    // all go: insert a comment
-    
-
-    // then update the expiration date to a day from now
-    
-
-    // finally, return the comment
-    
+  const { rows: [comment] } = await client.query(
+    `INSERT INTO comments ("reportId", content )
+    VALUES ($1, $2)
+    RETURNING *
+    `, [reportId, commentFields.content]
+  )
+    console.log("looking for comment", comment);
+    if(comment.content){
+      return comment;
+    }
 
   } catch (error) {
     throw error;
@@ -256,5 +261,6 @@ module.exports = {
   createReport,
   getOpenReports,
   _getReport,
-  closeReport
+  closeReport,
+  createReportComment
 }
