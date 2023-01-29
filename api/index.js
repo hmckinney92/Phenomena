@@ -1,27 +1,8 @@
 // Build an apiRouter using express Router
-// const express = require('express');
-// const app = express();
-// const pg = require('pg');
-// const db = require('./db');
-// const client = new pg.Client(process.env.DATABASE_URL || 'postgres://localhost/db');
-
-// const port = process.env.PORT || 3000;
-
-// app.listen(port, async ()=> {
-//     console.log(`listening on port ${port}`);
-//     try { 
-//         console.log("connecting to DB...");
-//         await client.connect();
-        
-//     } catch (error) {
-//         console.error(error);
-//         console.log("Cannot connect to DB...");
-//     }
-    
-// })
+const router = require ('express').Router();
 
 // Import the database adapter functions from the db
-
+const db = require('../db');
 
 /**
  * Set up a GET request for /reports
@@ -31,7 +12,15 @@
  * - on success, it should send back an object like { reports: theReports }
  * - on caught error, call next(error)
  */
-
+ router.get('/reports', async (req, res, next)=> {
+    try {
+        const reports = await db.getOpenReports();
+        // console.log(reports);
+        res.send( {reports} );
+    } catch (ex) {
+        next(ex);
+    }
+});
 
 /**
  * Set up a POST request for /reports
@@ -42,7 +31,15 @@
  * - on caught error, call next(error)
  */
 
-
+ router.post('/reports', async (req, res, next)=> {
+    try {
+        const report = await db.createReport(req.body);
+        //console.log(report);
+        res.send(report);
+    } catch (ex) {
+        next(ex);
+    }
+});
 
 /**
  * Set up a DELETE request for /reports/:reportId
@@ -69,3 +66,4 @@
 
 
 // Export the apiRouter
+module.exports = router;

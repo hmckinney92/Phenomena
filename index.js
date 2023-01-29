@@ -5,16 +5,8 @@ const cors = require ('cors');
 const db = require('./db');
 
 app.use(cors());
-
-app.get('/api/reports', async (req, res, next)=> {
-    try {
-        const reports = await db.getOpenReports();
-        console.log(reports);
-        res.send( {reports} );
-    } catch (ex) {
-        next(ex);
-    }
-});
+app.use(express.json()); 
+app.use('/api', require('./api'));
 
 const port = process.env.PORT || 3000;
 
