@@ -1,24 +1,32 @@
 // Use the dotenv package, to create environment variables
 const express = require('express');
-const server = express();
-const pg = require('pg');
-const client = new pg.Client(process.env.DATABASE_URL ||
-    'postgres://localhost/3000');
+const app = express();
+const cors = require ('cors');
+const db = require('./db');
 
-const port = process.env.PORT || 3000;
+app.use(cors());
 
-server.listen(port, async() => {
+app.get('/api/reports', async (req, res, next)=> {
     try {
-        console.log(`listening on port ${port}`);
-        await client.connect();
-        
-    }
-    catch {
-        
+        const reports = await db.getOpenReports();
+        console.log(reports);
+        res.send( {reports} );
+    } catch (ex) {
+        next(ex);
     }
 });
 
+const port = process.env.PORT || 3000;
 
+app.listen(port, async()=> {
+    try {
+        console.log(`listening on port ${port}`);
+        await db.client.connect();
+        
+    } catch (ex) {
+        console.log(ex);
+    }
+})
 // Create a constant variable, PORT, based on what's in process.env.PORT or fallback to 3000
 
 // Import express, and create a server

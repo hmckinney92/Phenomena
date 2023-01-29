@@ -1,5 +1,24 @@
 // Build an apiRouter using express Router
+// const express = require('express');
+// const app = express();
+// const pg = require('pg');
+// const db = require('./db');
+// const client = new pg.Client(process.env.DATABASE_URL || 'postgres://localhost/db');
 
+// const port = process.env.PORT || 3000;
+
+// app.listen(port, async ()=> {
+//     console.log(`listening on port ${port}`);
+//     try { 
+//         console.log("connecting to DB...");
+//         await client.connect();
+        
+//     } catch (error) {
+//         console.error(error);
+//         console.log("Cannot connect to DB...");
+//     }
+    
+// })
 
 // Import the database adapter functions from the db
 
@@ -12,7 +31,6 @@
  * - on success, it should send back an object like { reports: theReports }
  * - on caught error, call next(error)
  */
-
 
 
 /**
