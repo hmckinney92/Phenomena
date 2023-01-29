@@ -56,7 +56,7 @@ const db = require('../db');
         const { reportId } = req.params;
         const { password } = req.body;
         const report = await db.closeReport(reportId, password);
-        //console.log(report, "looking for report Id");
+        console.log(report, "looking for report Id");
         res.send(report);
     } catch (ex) {
         next(ex);
@@ -72,6 +72,15 @@ const db = require('../db');
  * - on success, it should send back the object returned by createReportComment
  * - on caught error, call next(error)
  */
+ router.post('/reports/:reportId/comments', async (req, res, next)=> {
+    try {
+        const { reportId } = req.params;
+        const report = await db.createReportComment(reportId, req.body);
+        res.send(report);
+    } catch (ex) {
+        next(ex);
+    }
+});
 
 
 // Export the apiRouter
