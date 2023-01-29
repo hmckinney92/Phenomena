@@ -1,4 +1,23 @@
 // Use the dotenv package, to create environment variables
+const express = require('express');
+const server = express();
+const pg = require('pg');
+const client = new pg.Client(process.env.DATABASE_URL ||
+    'postgres://localhost/3000');
+
+const port = process.env.PORT || 3000;
+
+server.listen(port, async() => {
+    try {
+        console.log(`listening on port ${port}`);
+        await client.connect();
+        
+    }
+    catch {
+        
+    }
+});
+
 
 // Create a constant variable, PORT, based on what's in process.env.PORT or fallback to 3000
 
